@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}Ruta Operativa - Ágora Finance{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    /* --- 1. AJUSTES DE DISEÑO ADAPTABLE --- */
+    .admin-view-banner {
+        background: #ffc107; color: #000; 
+        text-align: center; font-weight: bold; 
+        font-size: 0.85rem; padding: 8px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .kpi-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 15px; padding: 1.5rem;
+        position: relative; overflow: hidden;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 15px var(--shadow);
+    }
+    .kpi-card:hover { transform: translateY(-2px); }
+    .kpi-card::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%;
+        background-color: var(--accent-color);
+    }
+    
+    .kpi-label { 
+        font-size: 0.75rem; text-transform: uppercase; 
+        color: var(--text-muted); font-weight: 700; letter-spacing: 1px;
+    }
+    .kpi-value { 
+        font-size: 1.8rem; font-weight: 800; 
+        color: var(--text-main); margin-bottom: 0; 
+    }
+
+    /* --- 2. MAPA ADAPTABLE (OSCURO/CLARO) --- */
+    #map-container {
+        border-radius: 15px; overflow: hidden; 
+        border: 1px solid var(--border-color);
+        height: 500px; position: relative;
+        box-shadow: 0 4px 20px var(--shadow);
+        z-index: 1;
+    }
+    #map { height: 100%; width: 100%; }
+
+    :root[data-theme="dark"] .leaflet-layer,
+    :root[data-theme="dark"] .leaflet-control-zoom-in,
+    :root[data-theme="dark"] .leaflet-control-zoom-out,
+    :root[data-theme="dark"] .leaflet-control-attribution {
+        filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    }
+
+    /* --- 3. LISTA DE CLIENTES --- */
+    .client-list-wrapper {
+        max-height: 500px; overflow-y: auto; padding-right: 5px;
+    }
+    .client-list-wrapper::-webkit-scrollbar { width: 6px; }
+    .client-list-wrapper::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+    .client-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px; margin-bottom: 15px; 
+        padding: 15px; cursor: pointer; 
+        transition: all 0.2s ease; position: relative;
+    }
+    .client-card:hover { 
+        border-color: var(--accent-color); 
+        box-shadow: 0 5px 15px rgba(0, 229, 255, 0.1);
+    }
+    
+    .avatar-circle {
+        width: 45px; height: 45px;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        color: var(--accent-color);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 1.1rem;
+    }
+
+    .btn-action { 
+        background: var(--accent-color); color: #000; 
+        font-weight: 700; border: none; 
+    }
+    :root[data-theme="light"] .btn-action { color: #fff; }
+    
+    .btn-action:hover { 
+        background: var(--accent-hover); color: #fff;
+        box-shadow: 0 0 15px var(--accent-color); 
+    }
+    
+    .btn-waze { 
+        background-color: #33ccff; color: #fff; 
+        font-weight: 600; font-size: 0.8rem; border: none; 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if admin_view %}
+<div class="admin-view-banner">
+    <i class="fas fa-eye me-2"></i> VISTA DE SUPERVISOR - Monitoreando a: <strong>{{ empleado_nombre }}</strong>
+</div>
+{% endif %}
+
+<div class="container-fluid px-4 py-4">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h2 class="fw-bold mb-1" style="color: var(--text-main);">Panel Operativo</h2>
+                <p class="mb-0" style="color: var(--text-muted);">Gestión de ruta y recaudos en tiempo real.</p>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label"><i class="fas fa-users me-2"></i>Clientes</div>
+                <div class="kpi-value">{{ clients|length }}</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card" style="border-left-color: #2ea043;">
+                <div class="kpi-label"><i class="fas fa-wallet me-2"></i>Recaudo Hoy</div>
+                <div class="kpi-value text-success" id="kpi-recaudo">$0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8 order-2 order-lg-1">
+            <div class="card bg-transparent border-0 shadow-none">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold m-0" style="color: var(--text-main);"><i class="fas fa-map me-2 text-info"></i>Mapa de Ruta</h5>
+                    <span class="badge rounded-pill" style="background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--border-color);">
+                        <i class="fas fa-satellite-dish me-1 text-success"></i> Online
+                    </span>
+                </div>
+                <div id="map-container">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 order-1 order-lg-2">
+            <h5 class="fw-bold mb-3" style="color: var(--text-main);"><i class="fas fa-clipboard-list me-2 text-warning"></i>Lista de Cobro</h5>
+            
+            <div class="client-list-wrapper">
+                {% if not clients %}
+                    <div class="alert text-center py-5" style="background: var(--bg-card); border: 1px dashed var(--border-color); color: var(--text-muted);">
+                        <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                        <h5>Sin clientes asignados</h5>
+                        <p class="mb-0">No se encontraron clientes para este cobrador.</p>
+                    </div>
+                {% endif %}
+
+                {% for client in clients %}
+                <div class="client-card" onclick="focalizarMapa({{ client.latitud }}, {{ client.longitud }})">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle me-3">
+                                {{ client.nombre[:1] }}
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0" style="color: var(--text-main);">{{ client.nombre }} {{ client.apellidos }}</h6>
+                                <small style="color: var(--text-muted);"><i class="fas fa-phone-alt me-1"></i>{{ client.telefono }}</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    </div>
+
+                    <div class="mb-3 ps-1">
+                        <small class="d-block opacity-75" style="color: var(--text-main);">
+                            <i class="fas fa-location-arrow me-1 text-danger"></i> {{ client.direccion or 'Sin dirección' }}
+                        </small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-action flex-grow-1 py-2 rounded-3" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#modalCobro" 
+                                data-nombre="{{ client.nombre }} {{ client.apellidos }}"
+                                data-id="{{ client.id }}">
+                            <i class="fas fa-hand-holding-usd me-1"></i> Cobrar
+                        </button>
+                        {% if client.latitud and client.longitud %}
+                        <a href="https://waze.com/ul?ll={{ client.latitud }},{{ client.longitud }}&navigate=yes" target="_blank" class="btn btn-sm btn-waze flex-grow-1 py-2 rounded-3">
+                            <i class="fab fa-waze me-1"></i> Ir con Waze
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCobro" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Registrar Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4 p-3 rounded-3" style="background: var(--bg-input);">
+                    <h4 class="fw-bold mt-1 mb-0" style="color: var(--accent-color);" id="nombreClienteCobro">Cargando...</h4>
+                    <input type="hidden" id="idClienteCobro">
+                </div>
+                
+                <form id="formCobro" onsubmit="event.preventDefault(); enviarCobro();">
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">VALOR DEL ABONO</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" id="montoCobro" class="form-control fs-4 fw-bold" placeholder="0" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">NOTAS</label>
+                        <textarea id="obsCobro" class="form-control" rows="2" placeholder="Opcional..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-action w-100 py-3 fs-5 shadow">
+                        REGISTRAR AHORA <i class="fas fa-check-circle ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+    // Configuración inicial (Medellín por defecto si no hay datos)
+    const clientsData = {{ clients|tojson }};
+    let totalRecaudado = 0; 
+
+    var map = L.map('map').setView([6.2442, -75.5812], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OSM',
+        maxZoom: 19
+    }).addTo(map);
+
+    const redIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+
+    const markers = [];
+    if (clientsData.length > 0) {
+        clientsData.forEach(client => {
+            if(client.latitud && client.longitud) {
+                const marker = L.marker([client.latitud, client.longitud], {icon: redIcon})
+                    .addTo(map)
+                    .bindPopup(`<b>${client.nombre} ${client.apellidos}</b>`);
+                
+                markers.push({ lat: client.latitud, lon: client.longitud, instance: marker });
+            }
+        });
+        
+        if(markers.length > 0) {
+            const group = new L.featureGroup(markers.map(m => m.instance));
+            map.fitBounds(group.getBounds().pad(0.2));
+        }
+    }
+
+    window.focalizarMapa = function(lat, lon) {
+        if(!lat || !lon) return;
+        if(window.innerWidth < 992) {
+            document.getElementById('map-container').scrollIntoView({behavior: 'smooth'});
+        }
+        map.flyTo([lat, lon], 17, { animate: true, duration: 1.5 });
+        const target = markers.find(m => m.lat === lat && m.lon === lon);
+        if (target) setTimeout(() => target.instance.openPopup(), 1500);
+    };
+
+    const modalCobro = document.getElementById('modalCobro');
+    if (modalCobro) {
+        modalCobro.addEventListener('show.bs.modal', event => {
+            const btn = event.relatedTarget;
+            document.getElementById('nombreClienteCobro').textContent = btn.getAttribute('data-nombre');
+            document.getElementById('idClienteCobro').value = btn.getAttribute('data-id');
+            document.getElementById('montoCobro').value = '';
+        });
+    }
+
+    function enviarCobro() {
+        const id_cliente = document.getElementById('idClienteCobro').value;
+        const monto = document.getElementById('montoCobro').value;
+        const obs = document.getElementById('obsCobro').value;
+
+        fetch("/registrar_pago", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuario_id: id_cliente, monto: monto, notas: obs })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                totalRecaudado += parseInt(monto);
+                document.getElementById('kpi-recaudo').textContent = '$' + totalRecaudado.toLocaleString('es-CO');
+                bootstrap.Modal.getInstance(modalCobro).hide();
+                Swal.fire({ icon: 'success', title: 'Abono Registrado', background: 'var(--bg-card)', color: 'var(--text-main)' });
+            }
+        });
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Sobre Nosotros - AGORA PRÉSTAMOS{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4">Conoce a <span class="logo-maintext-nav">Ág<span class="logo-o">o</span>ra</span><span class="logo-subtext-nav">Finance</span></h1>
+            <p class="lead">Tu aliado financiero de confianza para alcanzar tus metas.</p>
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h2>Nuestra Misión</h2>
+            <p>Facilitar el acceso a soluciones financieras justas, transparentes y ágiles que impulsen el crecimiento personal y profesional de nuestros clientes. Nos comprometemos a ofrecer un servicio excepcional basado en la confianza y la tecnología, adaptándonos a las necesidades de cada persona para construir un futuro financiero más sólido.</p>
+        </div>
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='Agora_Mision.png') }}" alt="Nuestra Misión" class="img-fluid rounded shadow">
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5 flex-row-reverse">
+        <div class="col-md-6">
+            <h2>Nuestra Visión</h2>
+            <p>Ser la plataforma de préstamos líder y de mayor confianza en la región, reconocida por nuestra innovación, nuestro impacto positivo en la comunidad y por empoderar a las personas a tomar el control de sus finanzas. Aspiramos a un mundo donde las oportunidades financieras estén al alcance de todos.</p>
+        </div>
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='Agora_Vision.png') }}" alt="Nuestra Visión" class="img-fluid rounded shadow">
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-12">
+            <h2>Nuestros Valores</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-3">
+                <div class="card-body">
+                    <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Confianza</h5>
+                    <p class="card-text">Actuamos con integridad y transparencia en cada interacción.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-3">
+                <div class="card-body">
+                    <i class="fas fa-lightbulb fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Innovación</h5>
+                    <p class="card-text">Buscamos constantemente mejorar nuestros procesos y servicios.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-3">
+                <div class="card-body">
+                    <i class="fas fa-heart fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Compromiso</h5>
+                    <p class="card-text">Nos dedicamos al éxito financiero y la satisfacción de nuestros clientes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

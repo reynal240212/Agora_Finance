@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Completa tu Perfil - Ágora Finance{% endblock %}
+
+{% block head_extra %}
+<style>
+    .profile-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 30px var(--shadow);
+    }
+
+    .logo-maintext { font-size: 2.5rem; font-weight: 900; color: var(--text-main); letter-spacing: -1px; }
+    .logo-o { color: var(--accent-color); text-shadow: 0 0 10px var(--accent-color); }
+    .logo-subtext { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); letter-spacing: 4px; }
+    .form-label { font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
+    
+    .conditional-section {
+        display: none;
+        border-left: 3px solid var(--accent-color);
+        padding-left: 1.5rem;
+        margin-top: 1rem;
+        animation: fadeIn 0.4s ease-out;
+        background: rgba(0, 229, 255, 0.05);
+        padding: 15px;
+        border-radius: 0 10px 10px 0;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-submit {
+        background-color: var(--accent-color);
+        color: #000;
+        font-weight: 800;
+        padding: 1rem;
+        font-size: 1.1rem;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        background-color: var(--accent-hover);
+        color: #fff;
+        box-shadow: 0 0 20px var(--accent-color);
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="profile-card">
+                <div class="text-center mb-4">
+                    <span class="logo-maintext">ÁG<span class="logo-o">O</span>RA</span><br>
+                    <span class="logo-subtext">FINANCE</span>
+                    <hr class="border-secondary my-4" style="opacity: 0.2;">
+                    <h2 class="fw-bold h3" style="color: var(--text-main);">Tu Perfil</h2>
+                    <p class="text-muted">Mantén tus datos actualizados para tus solicitudes de crédito.</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('guardar_perfil') }}">
+                    
+                    <h5 class="border-bottom pb-2 mb-4 fw-bold" style="color: var(--accent-color); border-color: var(--border-color)!important;">
+                        <i class="bi bi-person-vcard-fill me-2"></i>Información Personal
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label">Nombre(s)</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                   value="{{ perfil.get('nombre', '') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellidos" class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" id="apellidos" name="apellidos" 
+                                   value="{{ perfil.get('apellidos', '') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cedula" class="form-label">Cédula / DNI</label>
+                            <input type="number" class="form-control" id="cedula" name="cedula" 
+                                   value="{{ perfil.get('cedula', '') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="numero" class="form-label">Número de Celular</label>
+                            <input type="tel" class="form-control" id="numero" name="numero" 
+                                   value="{{ perfil.get('numero', '') }}" required>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="direccion" class="form-label text-warning fw-bold">Dirección de Residencia</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-secondary text-warning"><i class="bi bi-geo-alt-fill"></i></span>
+                                <input type="text" class="form-control border-warning" id="direccion" name="direccion" 
+                                       value="{{ perfil.get('direccion', '') }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mt-5 mb-4 fw-bold" style="color: var(--accent-color); border-color: var(--border-color)!important;">
+                       <i class="bi bi-briefcase-fill me-2"></i>Situación Económica
+                    </h5>
+                    
+                    <div class="mb-4 p-3 rounded" style="background-color: var(--bg-input); border: 1px solid var(--border-color);">
+                        <p class="form-label mb-3" style="color: var(--text-main);">¿Trabajas actualmente?</p>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="situacion_laboral" id="trabaja_si" value="si" 
+                                   {% if perfil.get('situacion_laboral') == 'si' %}checked{% endif %} required>
+                            <label class="form-check-label" for="trabaja_si" style="color: var(--text-muted);">Sí, tengo empleo / negocio</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="situacion_laboral" id="trabaja_no" value="no"
+                                   {% if perfil.get('situacion_laboral') == 'no' %}checked{% endif %}>
+                            <label class="form-check-label" for="trabaja_no" style="color: var(--text-muted);">No trabajo actualmente</label>
+                        </div>
+                    </div>
+
+                    <div id="datosLaborales" class="conditional-section">
+                        <p class="fw-bold mb-3" style="color: var(--accent-color);">Detalles del Empleo:</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="empresa" class="form-label">Nombre de Empresa / Negocio</label>
+                                <input type="text" class="form-control" id="empresa" name="empresa" 
+                                       value="{{ perfil.get('empresa', '') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="salario" class="form-label">Ingresos Mensuales</label>
+                                <div class="input-group">
+                                    <span class="input-group-text text-muted">$</span>
+                                    <input type="number" class="form-control" id="salario" name="salario" 
+                                           value="{{ perfil.get('salario', '') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="datosReferencia" class="conditional-section" style="border-color: #ffc107; background: rgba(255, 193, 7, 0.05);">
+                         <p class="fw-bold mb-3 text-warning">Referencia Personal:</p>
+                         <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="nombre_referencia" class="form-label">Nombre de la Referencia</label>
+                                <input type="text" class="form-control" id="nombre_referencia" name="nombre_referencia" 
+                                       value="{{ perfil.get('nombre_referencia', '') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="telefono_referencia" class="form-label">Teléfono de Contacto</label>
+                                <input type="tel" class="form-control" id="telefono_referencia" name="telefono_referencia" 
+                                       value="{{ perfil.get('telefono_referencia', '') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-5">
+                        <button type="submit" class="btn btn-submit rounded-pill shadow fw-bold">
+                            ACTUALIZAR PERFIL <i class="bi bi-check-circle-fill ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const radioSi = document.getElementById('trabaja_si');
+        const radioNo = document.getElementById('trabaja_no');
+        const seccionLaboral = document.getElementById('datosLaborales');
+        const seccionReferencia = document.getElementById('datosReferencia');
+        
+        const inputsLaborales = seccionLaboral.querySelectorAll('input');
+        const inputsReferencia = seccionReferencia.querySelectorAll('input');
+
+        function toggleFields() {
+            if (radioSi.checked) {
+                seccionLaboral.style.display = 'block';
+                seccionReferencia.style.display = 'none';
+                inputsLaborales.forEach(input => input.setAttribute('required', ''));
+                inputsReferencia.forEach(input => input.removeAttribute('required'));
+            } else if (radioNo.checked) {
+                seccionLaboral.style.display = 'none';
+                seccionReferencia.style.display = 'block';
+                inputsLaborales.forEach(input => input.removeAttribute('required'));
+                inputsReferencia.forEach(input => input.setAttribute('required', ''));
+            }
+        }
+
+        radioSi.addEventListener('change', toggleFields);
+        radioNo.addEventListener('change', toggleFields);
+        
+        // Disparo inicial para mostrar la sección correcta según los datos cargados
+        if(radioSi.checked || radioNo.checked) {
+            toggleFields();
+        }
+    });
+</script>
+{% endblock %}

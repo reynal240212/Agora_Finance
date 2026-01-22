@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil - Ágora Finance{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* Forzar estilos oscuros para asegurar legibilidad en esta vista específica */
+    .profile-section {
+        background-color: #0d1117; /* Fondo general oscuro */
+        min-height: 100vh;
+        padding-bottom: 2rem;
+    }
+
+    .card-profile-dark {
+        background-color: #161b22 !important; /* Tarjeta gris oscuro */
+        border: 1px solid #30363d !important;
+        color: #e6edf3 !important; /* Texto base claro */
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* Títulos y Valores */
+    .text-bright {
+        color: #ffffff !important; /* Blanco puro */
+        font-weight: 600;
+    }
+    
+    .label-muted {
+        color: #8b949e !important; /* Gris claro para etiquetas */
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    /* Iconos */
+    .icon-box {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(0, 229, 255, 0.15); /* Azul Neón Transparente */
+        color: #00E5FF; /* Azul Neón */
+        font-size: 1.2rem;
+        margin-right: 15px;
+    }
+    
+    .section-title {
+        color: #00E5FF !important; /* Azul neón suave */
+        border-bottom: 1px solid #30363d;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    /* Botones */
+    .btn-edit {
+        background-color: #238636;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: bold;
+        text-decoration: none; /* Asegurar que no tenga subrayado */
+        display: inline-block;
+    }
+    .btn-edit:hover {
+        background-color: #2ea043;
+        color: white;
+    }
+    
+    .btn-back {
+        border: 1px solid #30363d;
+        color: #c9d1d9;
+        background: transparent;
+    }
+    .btn-back:hover {
+        background: #30363d;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-section">
+    <div class="container py-4">
+        
+        <!-- Encabezado superior -->
+        <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+            <h1 class="h3 fw-bold text-bright mb-0">Mi Perfil</h1>
+            <!-- CORRECCIÓN: client.dashboard -->
+            <a href="{{ url_for('client.dashboard') }}" class="btn btn-back btn-sm">
+                <i class="bi bi-arrow-left me-2"></i>Volver al Dashboard
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card card-profile-dark">
+                    <div class="card-body p-4 p-md-5">
+                        
+                        <!-- Encabezado del Usuario -->
+                        <div class="d-flex flex-column flex-md-row align-items-center mb-5 pb-4 border-bottom border-secondary">
+                            <div class="d-flex align-items-center justify-content-center bg-dark rounded-circle border border-info mb-3 mb-md-0 me-md-4" style="width: 90px; height: 90px;">
+                                <i class="bi bi-person-fill fs-1 text-info"></i>
+                            </div>
+                            <div class="text-center text-md-start">
+                                <h2 class="text-bright mb-1">{{ perfil.nombre }} {{ perfil.apellidos }}</h2>
+                                <p class="label-muted mb-2">{{ perfil.correo }}</p>
+                                <span class="badge bg-info bg-opacity-25 text-info border border-info rounded-pill">
+                                    {{ perfil.rol|default('Cliente') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row g-5">
+                            <!-- Columna Izquierda -->
+                            <div class="col-md-6">
+                                <h5 class="section-title"><i class="bi bi-person-lines-fill me-2"></i>Datos Personales</h5>
+                                
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="icon-box"><i class="bi bi-person-vcard"></i></div>
+                                    <div>
+                                        <span class="label-muted">Cédula / DNI</span>
+                                        <div class="text-bright fs-5">{{ perfil.cedula }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="icon-box"><i class="bi bi-phone"></i></div>
+                                    <div>
+                                        <span class="label-muted">Teléfono</span>
+                                        <!-- Uso de 'or' por si el campo se llama numero o telefono -->
+                                        <div class="text-bright fs-5">{{ perfil.numero or perfil.telefono }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="icon-box text-danger" style="color: #ff7b72; background: rgba(255, 123, 114, 0.15);"><i class="bi bi-geo-alt"></i></div>
+                                    <div>
+                                        <span class="label-muted">Dirección</span>
+                                        <div class="text-bright fs-6">{{ perfil.direccion or 'No registrada' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna Derecha -->
+                            <div class="col-md-6">
+                                <h5 class="section-title"><i class="bi bi-wallet2 me-2"></i>Información Financiera</h5>
+                                
+                                <div class="mb-4">
+                                    <span class="label-muted mb-2">Situación Laboral</span>
+                                    {% if perfil.situacion_laboral == "si" %}
+                                        <div class="p-3 rounded border border-success bg-success bg-opacity-10">
+                                            <div class="text-success fw-bold"><i class="bi bi-check-circle-fill me-2"></i>Empleado / Negocio</div>
+                                        </div>
+                                        <div class="mt-3 ps-2 border-start border-success">
+                                            <span class="label-muted">Empresa</span>
+                                            <div class="text-bright mb-2">{{ perfil.empresa or 'N/A' }}</div>
+                                            
+                                            <span class="label-muted">Ingresos Mensuales</span>
+                                            <div class="text-success fs-4 fw-bold">
+                                                ${{ "{:,.0f}".format(perfil.salario|default(0)|int).replace(',', '.') }}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="p-3 rounded border border-warning bg-warning bg-opacity-10">
+                                            <div class="text-warning fw-bold"><i class="bi bi-exclamation-circle-fill me-2"></i>Sin empleo formal</div>
+                                        </div>
+                                        <div class="mt-3 p-3 bg-dark rounded border border-secondary">
+                                            <span class="label-muted text-info fw-bold mb-2">REFERENCIA PERSONAL</span>
+                                            <div class="text-bright"><i class="bi bi-person me-2"></i>{{ perfil.nombre_referencia or 'N/A' }}</div>
+                                            <div class="text-bright"><i class="bi bi-telephone me-2"></i>{{ perfil.telefono_referencia or 'N/A' }}</div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie de tarjeta -->
+                        <div class="text-center mt-5 pt-4 border-top border-secondary">
+                            <!-- CORRECCIÓN: client.perfil_inicial -->
+                            <a href="{{ url_for('client.perfil_inicial') }}" class="btn btn-edit shadow">
+                                <i class="bi bi-pencil-square me-2"></i>Editar Información
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

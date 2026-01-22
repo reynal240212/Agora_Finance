@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Administración - Ágora Finance{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* --- ESTILOS ADAPTABLES (MODO CLARO / OSCURO) --- */
+    .wrapper { display: flex; width: 100%; align-items: stretch; }
+    
+    #sidebar {
+        min-width: 260px; max-width: 260px;
+        background: var(--bg-card); 
+        color: var(--text-main);
+        border-right: 1px solid var(--border-color);
+        position: fixed; height: 100vh; z-index: 999; transition: 0.3s;
+    }
+
+    .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+    
+    #sidebar ul.components { padding: 20px 0; }
+    #sidebar ul li a {
+        padding: 15px 25px; font-size: 1.1em; display: block;
+        color: var(--text-muted); text-decoration: none; transition: 0.3s;
+        border-left: 4px solid transparent;
+    }
+    #sidebar ul li a:hover { 
+        color: var(--text-main); 
+        background: rgba(128, 128, 128, 0.1);
+    }
+    #sidebar ul li a.active {
+        background: rgba(0, 229, 255, 0.1); color: var(--accent-color);
+        border-left: 4px solid var(--accent-color); font-weight: 700;
+    }
+
+    #sidebar .user-profile {
+        position: absolute; bottom: 0; width: 100%; padding: 20px;
+        border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.05);
+    }
+
+    #content { width: 100%; padding: 20px; min-height: 100vh; margin-left: 260px; transition: 0.3s; }
+
+    .mobile-nav {
+        display: none; background: var(--bg-card); padding: 15px;
+        border-bottom: 1px solid var(--border-color); margin-bottom: 20px; border-radius: 8px;
+    }
+
+    @media (max-width: 992px) {
+        #sidebar { margin-left: -260px; }
+        #sidebar.active { margin-left: 0; }
+        #content { margin-left: 0; }
+        .mobile-nav { display: flex !important; justify-content: space-between; align-items: center; }
+    }
+
+    .card-admin {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-main);
+    }
+
+    .table-container { 
+        border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); 
+        background-color: var(--bg-card);
+    }
+    
+    .table { margin-bottom: 0; color: var(--text-main); border-color: var(--border-color); }
+    
+    .table thead th {
+        background-color: var(--accent-color) !important; 
+        color: #fff !important;
+        border-bottom: 2px solid var(--border-color); 
+        text-transform: uppercase; font-size: 0.8rem; padding: 15px;
+    }
+    :root[data-theme="dark"] .table thead th { background: linear-gradient(180deg, #1f6feb, #0d4aa3) !important; }
+
+    .table tbody td {
+        background-color: var(--bg-card) !important; 
+        color: var(--text-main) !important;
+        border-bottom: 1px solid var(--border-color); 
+        padding: 12px 15px; vertical-align: middle;
+    }
+    .table-hover tbody tr:hover td { 
+        background-color: var(--table-hover) !important; 
+    }
+
+    .text-info-custom { color: var(--accent-color); }
+    .text-muted-custom { color: var(--text-muted); font-size: 0.85rem; }
+
+    .badge-cobrador { 
+        border: 1px solid var(--accent-color); color: var(--accent-color); 
+        background: rgba(0, 229, 255, 0.1); padding: 5px 10px; border-radius: 50px; font-size: 0.75rem; 
+    }
+
+    .modal-content { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+    .modal-header { border-bottom: 1px solid var(--border-color); background-color: var(--bg-input); }
+    .btn-close { filter: invert(var(--invert-icon)); }
+    
+    :root[data-theme="dark"] .btn-close { filter: invert(1); }
+    :root[data-theme="light"] .btn-close { filter: invert(0); }
+
+    .form-control, .form-select {
+        background-color: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <span class="h4 fw-bold" style="font-family: 'Montserrat', sans-serif; color: var(--text-main);">
+                ÁG<span style="color: var(--accent-color);">O</span>RA
+            </span>
+            <div class="small mt-1" style="color: var(--text-muted); letter-spacing: 2px; font-size: 0.65rem;">PANEL ADMIN</div>
+        </div>
+
+        <ul class="list-unstyled components">
+            <li><a href="{{ url_for('administracion') }}" class="active"><i class="bi bi-people-fill me-2"></i> Usuarios</a></li>
+            <li><a href="#"><i class="bi bi-map-fill me-2"></i> Mapa Cobros</a></li>
+            <li><a href="{{ url_for('gestion_prestamos') }}"><i class="bi bi-cash-stack me-2"></i> Préstamos</a></li>
+        </ul>
+
+        <div class="user-profile">
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2 text-white fw-bold" style="width: 40px; height: 40px;">
+                    {{ session.get('nombre', 'A')[:1] }}
+                </div>
+                <div class="overflow-hidden">
+                    <div class="fw-bold text-truncate" style="max-width: 140px; color: var(--text-main);">{{ session.get('nombre', 'Admin') }}</div>
+                    <small class="text-success" style="font-size: 0.75rem;">● En línea</small>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm w-100 fw-bold"><i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div id="content">
+        <div class="mobile-nav shadow-sm">
+            <span class="h4 fw-bold m-0" style="color: var(--text-main);">ÁG<span style="color: var(--accent-color);">O</span>RA</span>
+            <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary"><i class="bi bi-list fs-4"></i></button>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="card-admin p-4 mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-4">
+                    <label class="form-label"><i class="bi bi-filter me-1"></i>Filtrar por Cobrador</label>
+                    <select id="filter-employee-table" class="form-select" onchange="filtrarPorEmpleado()">
+                        <option value="all" selected>Todos los Clientes</option>
+                        {% for emp in empleados %}
+                            <option value="{{ emp.id }}">👤 {{ emp.nombre }} {{ emp.apellidos }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-5">
+                    <label class="form-label"><i class="bi bi-search me-1"></i>Buscar Usuario</label>
+                    <form method="GET" action="{{ url_for('administracion') }}">
+                        <div class="input-group">
+                            <input type="text" name="valor" class="form-control" placeholder="Nombre o Cédula..." value="{{ request.args.get('valor', '') }}">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-3 text-end">
+                    <button class="btn btn-success w-100 fw-bold text-white" data-bs-toggle="modal" data-bs-target="#crearUsuarioModal">
+                        <i class="bi bi-person-plus-fill me-2"></i>Nuevo Usuario
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <div id="results-counter" class="small fw-bold" style="color: var(--text-muted);">Mostrando todos los usuarios</div>
+        </div>
+
+        {% if not usuarios %}
+            <div class="alert alert-secondary text-center py-5 border-0">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                <h5>No se encontraron usuarios</h5>
+            </div>
+        {% else %}
+            <div class="table-container shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Rol</th>
+                                <th>Nombre / Info</th>
+                                <th>Cobrador Asignado</th>
+                                <th>Contacto</th>
+                                <th>Estado</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios %}
+                            <tr class="user-row" data-cobrador="{{ usuario.cobrador_asignado_id|default('all') }}">
+                                <td class="ps-4">
+                                    <span class="badge {{ 'bg-primary' if usuario.rol == 'Empleado' else 'bg-info' if usuario.rol == 'Administrador' else 'bg-secondary' }}">
+                                        {{ usuario.rol }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold" style="color: var(--text-main);">{{ usuario.nombre }} {{ usuario.apellidos }}</div>
+                                    <div class="text-muted-custom small">CC: {{ usuario.cedula }}</div>
+                                </td>
+                                <td>
+                                    {% if usuario.rol == 'Cliente' %}
+                                        <div class="badge-cobrador">
+                                            <i class="bi bi-person-badge me-1"></i>
+                                            {% set cobrador_nombre = "Sin Asignar" %}
+                                            {% for emp in empleados %}
+                                                {% if emp.id == usuario.cobrador_asignado_id %}
+                                                    {% set cobrador_nombre = emp.nombre %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ cobrador_nombre }}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted-custom small">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="small text-info-custom">{{ usuario.correo }}</div>
+                                    <div class="text-muted-custom small">{{ usuario.telefono }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'bg-success' if usuario.estado == 'Activo' else 'bg-danger' }} text-white">
+                                        {{ usuario.estado }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editarUsuarioModal" data-usuario='{{ usuario|tojson }}'><i class="bi bi-pencil-fill"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#activacionModal" data-id="{{ usuario.id }}" data-nombre="{{ usuario.nombre }}" data-estado="{{ usuario.estado }}"><i class="bi bi-power"></i></button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div> 
+</div>
+
+<div class="modal fade" id="crearUsuarioModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="#">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Crear Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select name="rol" class="form-select" onchange="toggleAssign(this.value, 'new')">
+                            <option value="Cliente">Cliente</option>
+                            <option value="Empleado">Empleado</option>
+                            <option value="Administrador">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 p-2 rounded border border-secondary" style="background-color: var(--bg-input);" id="div-assign-new">
+                        <label class="form-label text-info-custom">Asignar Cobrador</label>
+                        <select name="cobrador_asignado_id" class="form-select">
+                            <option value="">-- Sin Asignar --</option>
+                            {% for emp in empleados %}<option value="{{ emp.id }}">{{ emp.nombre }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+                        <div class="col"><input type="text" name="apellidos" class="form-control" placeholder="Apellidos" required></div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col"><input type="text" name="cedula" class="form-control" placeholder="Cédula" required></div>
+                        <div class="col"><input type="tel" name="telefono" class="form-control" placeholder="Celular" required></div>
+                    </div>
+                    <div class="mb-3"><input type="email" name="correo" class="form-control" placeholder="Correo" required></div>
+                    <div class="mb-3"><input type="password" name="password" class="form-control" placeholder="Contraseña" required></div>
+                    <div class="mb-3"><input type="text" name="direccion" class="form-control" placeholder="Dirección"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary w-100">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="activacionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <h4 id="activacionTitle" class="fw-bold mb-3">Cambiar Estado</h4>
+                <p>Usuario: <strong id="nombre-usuario-activacion" class="text-info-custom"></strong></p>
+                <form id="formActivacion" method="POST">
+                    <input type="hidden" name="nuevo_estado" id="input-nuevo-estado">
+                    <button type="submit" id="btn-confirmar-activacion" class="btn w-100 fw-bold">CONFIRMAR</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Sidebar Control
+    const sidebar = document.getElementById('sidebar');
+    const sidebarCollapse = document.getElementById('sidebarCollapse');
+    if(sidebarCollapse){
+        sidebarCollapse.addEventListener('click', () => sidebar.classList.toggle('active'));
+    }
+
+    function filtrarPorEmpleado() {
+        const selected = document.getElementById('filter-employee-table').value;
+        const rows = document.querySelectorAll('.user-row');
+        let count = 0;
+        rows.forEach(row => {
+            const assigned = row.getAttribute('data-cobrador');
+            if (selected === 'all' || assigned === selected) {
+                row.style.display = ''; count++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        document.getElementById('results-counter').innerText = `Mostrando ${count} resultados.`;
+    }
+
+    function toggleAssign(rol, type) {
+        const divId = type === 'new' ? 'div-assign-new' : 'div-assign-edit';
+        const element = document.getElementById(divId);
+        if(element) element.style.display = (rol === 'Cliente') ? 'block' : 'none';
+    }
+
+    // Modal Events
+    document.addEventListener('DOMContentLoaded', function () {
+        const activacionModal = document.getElementById('activacionModal');
+        activacionModal.addEventListener('show.bs.modal', e => {
+            const btn = e.relatedTarget;
+            const id = btn.getAttribute('data-id');
+            const nombre = btn.getAttribute('data-nombre');
+            const estadoActual = btn.getAttribute('data-estado');
+            const nuevoEstado = (estadoActual === 'Activo') ? 'Inactivo' : 'Activo';
+            
+            document.getElementById('nombre-usuario-activacion').innerText = nombre;
+            document.getElementById('input-nuevo-estado').value = nuevoEstado;
+            document.getElementById('formActivacion').action = `/cambiar_estado/${id}`;
+            
+            const btnConf = document.getElementById('btn-confirmar-activacion');
+            btnConf.className = nuevoEstado === 'Activo' ? 'btn btn-success w-100' : 'btn btn-danger w-100';
+            btnConf.innerText = nuevoEstado === 'Activo' ? 'ACTIVAR ACCESO' : 'BLOQUEAR ACCESO';
+        });
+    });
+</script>
+{% endblock %}

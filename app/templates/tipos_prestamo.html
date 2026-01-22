@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Tipos de Préstamo - Ágora Finance{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4 fw-bold" style="color: var(--text-main);">Encuentra el Préstamo Ideal para Ti</h1>
+            <p class="lead" style="color: var(--text-muted);">Ofrecemos soluciones financieras flexibles y a tu medida. Explora nuestras opciones.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center shadow-sm border-0" style="background-color: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="icon-circle mx-auto mb-3" style="background: var(--bg-input); color: var(--accent-color);">
+                        <i class="fas fa-user-friends fa-2x"></i>
+                    </div>
+                    <h5 class="card-title fw-bold" style="color: var(--text-main);">Préstamos Personales</h5>
+                    <p class="card-text" style="color: var(--text-muted);">Para cumplir tus sueños, cubrir un gasto inesperado o consolidar tus deudas. Flexibilidad y rapidez en un solo lugar.</p>
+                    <ul class="list-unstyled my-4 text-start" style="color: var(--text-main);">
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Montos desde $1.000.000</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Aprobación en minutos</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Plazos de 6 a 36 meses</li>
+                    </ul>
+                    <a href="/login" class="btn btn-primary mt-auto w-100 py-2">Más Información</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center shadow-sm border-0" style="background-color: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="icon-circle mx-auto mb-3" style="background: var(--bg-input); color: var(--accent-color);">
+                        <i class="fas fa-car fa-2x"></i>
+                    </div>
+                    <h5 class="card-title fw-bold" style="color: var(--text-main);">Crédito de Vehículo</h5>
+                    <p class="card-text" style="color: var(--text-muted);">Financiamos el auto o la moto que necesitas para moverte. Tasas competitivas y un proceso sin complicaciones.</p>
+                    <ul class="list-unstyled my-4 text-start" style="color: var(--text-main);">
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Financia hasta el 100%</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Para vehículos nuevos o usados</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Plazos hasta 72 meses</li>
+                    </ul>
+                    <a href="/login" class="btn btn-primary mt-auto w-100 py-2">Ver Opciones</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 text-center shadow-sm border-0" style="background-color: var(--bg-card); border: 1px solid var(--border-color) !important;">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="icon-circle mx-auto mb-3" style="background: var(--bg-input); color: var(--accent-color);">
+                        <i class="fas fa-briefcase fa-2x"></i>
+                    </div>
+                    <h5 class="card-title fw-bold" style="color: var(--text-main);">Crédito para Negocios</h5>
+                    <p class="card-text" style="color: var(--text-muted);">Impulsa tu emprendimiento con capital de trabajo, compra de activos o expansión. Apoyamos a los que crean.</p>
+                    <ul class="list-unstyled my-4 text-start" style="color: var(--text-main);">
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Soluciones para PyMEs</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Desembolso ágil y seguro</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Asesoría personalizada</li>
+                    </ul>
+                    <a href="/login" class="btn btn-primary mt-auto w-100 py-2">Consultar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center mt-5 py-5 rounded shadow-sm" style="background-color: var(--bg-card); border: 1px solid var(--border-color);">
+        <div class="col-12 mb-4">
+            <h2 class="fw-bold" style="color: var(--text-main);">Obtén tu Préstamo en 3 Simples Pasos</h2>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3">
+                <i class="fas fa-laptop-code fa-3x mb-3" style="color: var(--accent-color);"></i>
+                <h4 style="color: var(--text-main);">1. Solicita en Línea</h4>
+                <p style="color: var(--text-muted);">Completa nuestro formulario seguro en pocos minutos desde cualquier dispositivo.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3">
+                <i class="fas fa-clipboard-check fa-3x mb-3" style="color: var(--accent-color);"></i>
+                <h4 style="color: var(--text-main);">2. Recibe Aprobación</h4>
+                <p style="color: var(--text-muted);">Nuestro sistema evalúa tu solicitud al instante y te damos una respuesta rápida.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3">
+                <i class="fas fa-money-bill-wave fa-3x mb-3" style="color: var(--accent-color);"></i>
+                <h4 style="color: var(--text-main);">3. Recibe tu Dinero</h4>
+                <p style="color: var(--text-muted);">Una vez aprobado, transferimos los fondos directamente a tu cuenta bancaria.</p>
+            </div>
+        </div>
+        <div class="col-12 mt-4">
+            <a href="/login" class="btn btn-primary btn-lg px-5 shadow">¡Comienza tu Solicitud Ahora!</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .icon-circle {
+        height: 75px;
+        width: 75px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+    }
+    .card:hover .icon-circle {
+        transform: scale(1.1);
+    }
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 25px var(--shadow) !important;
+    }
+</style>
+{% endblock %}

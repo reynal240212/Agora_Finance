@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Contacto - Ágora Finance{% endblock %}
+
+{% block head_extra %}
+<style>
+    .contact-section {
+        padding: 80px 0;
+    }
+
+    /* Panel Principal */
+    .contact-panel {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+
+    /* Sección Izquierda (Formulario) */
+    .contact-form-section {
+        padding: 3rem;
+    }
+
+    /* Sección Derecha (Info) */
+    .contact-info-section {
+        background-color: var(--bg-input); /* Se adapta al tema */
+        padding: 3rem;
+        border-left: 1px solid var(--border-color);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Inputs adaptables */
+    .form-control {
+        background-color: var(--bg-input) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-main) !important;
+        padding: 12px 15px;
+        border-radius: 10px;
+    }
+    
+    .form-control:focus {
+        border-color: var(--accent-color) !important;
+        box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15) !important;
+    }
+    
+    .form-control::placeholder {
+        color: var(--text-muted);
+        opacity: 0.6;
+    }
+
+    /* Lista de Iconos */
+    .contact-info-list {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 1rem;
+    }
+    .contact-info-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        color: var(--text-main);
+    }
+    .contact-info-list .icon {
+        flex-shrink: 0;
+        width: 50px;
+        height: 50px;
+        background: rgba(0, 229, 255, 0.1); /* Fondo transparente del color acento */
+        color: var(--accent-color);
+        border: 1px solid rgba(0, 229, 255, 0.2);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.5rem;
+        font-size: 1.2rem;
+        transition: 0.3s;
+    }
+    .contact-info-list li:hover .icon {
+        background: var(--accent-color);
+        color: #000;
+        box-shadow: 0 0 15px var(--accent-color);
+    }
+    
+    /* Mapa */
+    .map-container {
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Texto */
+    .text-main-color { color: var(--text-main); }
+    .text-muted-color { color: var(--text-muted); }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 991px) {
+        .contact-info-section {
+            border-left: none;
+            border-top: 1px solid var(--border-color);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-section">
+    <div class="container">
+        
+        <!-- Título -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-4 fw-bolder mb-3 text-main-color">Ponte en Contacto</h1>
+                <p class="fs-5 text-muted-color">
+                    ¿Tienes preguntas o necesitas asesoría financiera? Nuestro equipo está listo para ayudarte.
+                </p>
+            </div>
+        </div>
+
+        <!-- Panel -->
+        <div class="contact-panel">
+            <div class="row g-0">
+                
+                <!-- Columna Formulario -->
+                <div class="col-lg-7">
+                    <div class="contact-form-section">
+                        <h3 class="fw-bold mb-4 text-main-color">Envíanos un Mensaje</h3>
+                        <form action="#" method="POST">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="name" class="form-label text-muted-color small fw-bold">NOMBRE COMPLETO</label>
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="Ej: Juan Pérez" required>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="email" class="form-label text-muted-color small fw-bold">CORREO ELECTRÓNICO</label>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="tu@correo.com" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="subject" class="form-label text-muted-color small fw-bold">ASUNTO</label>
+                                <input type="text" class="form-control" id="subject" name="subject" placeholder="Ej: Solicitud de crédito" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="message" class="form-label text-muted-color small fw-bold">TU MENSAJE</label>
+                                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Cuéntanos en qué podemos ayudarte..." required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-acento w-100 py-3 fw-bold shadow rounded-pill">
+                                ENVIAR MENSAJE <i class="fas fa-paper-plane ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Columna Información -->
+                <div class="col-lg-5">
+                    <div class="contact-info-section">
+                        <h4 class="fw-bold mb-4 text-main-color">Canales Directos</h4>
+                        
+                        <ul class="contact-info-list">
+                            <li>
+                                <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
+                                <div>
+                                    <strong style="color: var(--accent-color);">Visítanos</strong><br>
+                                    <span class="text-muted-color">Calle 10 # 30-50, Medellín, CO</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-phone-alt"></i></span>
+                                <div>
+                                    <strong style="color: var(--accent-color);">Llámanos</strong><br>
+                                    <a href="tel:+573042034755" class="text-muted-color text-decoration-none">+57 304 203 4755</a>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-envelope"></i></span>
+                                <div>
+                                    <strong style="color: var(--accent-color);">Escríbenos</strong><br>
+                                    <a href="mailto:contacto@agora.com" class="text-muted-color text-decoration-none">contacto@agoraprestamos.com</a>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fab fa-whatsapp"></i></span>
+                                <div>
+                                    <strong style="color: var(--accent-color);">WhatsApp</strong><br>
+                                    <span class="text-muted-color">Atención 24/7</span>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <!-- Mapa Embebido -->
+                        <div class="map-container mt-auto">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.233141271923!2d-75.5728298!3d6.2329877!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e4428dfb80fad05%3A0x42137cfcc7b53b56!2sMedell%C3%ADn%2C%20Antioquia!5e0!3m2!1ses!2sco!4v1678886543210!5m2!1ses!2sco" 
+                                width="100%" 
+                                height="200" 
+                                style="border:0; filter: grayscale(100%) invert(92%) contrast(83%);" 
+                                allowfullscreen="" 
+                                loading="lazy">
+                            </iframe>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

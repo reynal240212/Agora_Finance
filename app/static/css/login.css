@@ -1,0 +1,182 @@
+/*
+ * 1. CONFIGURACIÓN GLOBAL Y FONDO
+*/
+
+body {
+    background-color: #f7faff; /* Fondo blanco-azulado, elegante para ÁGORA */
+    overflow-x: hidden;
+}
+
+.login-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 20px 40px;
+    z-index: 2;
+}
+
+/* Fondo corporativo (ajusta el nombre del archivo si es necesario) */
+.login-background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../fondo.png');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(42%) blur(4px); 
+    z-index: -1;
+}
+
+.login-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+/*
+ * 2. CONTENEDOR DEL FORMULARIO
+*/
+
+.login-container {
+    background-color: rgba(29, 34, 43, 0.92); /* Azul oscuro ÁGORA con transparencia */
+    max-width: 450px;
+    width: 100%;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 3.5rem;
+    box-shadow: 0 0 40px rgba(30, 231, 232, 0.15); /* Sombra turquesa soft */
+}
+
+/*
+ * 3. CAMPOS DE ENTRADA (INPUTS)
+*/
+
+.login-input {
+    background-color: #232938; /* Fondo input azul más oscuro */
+    border: none;
+    color: #ffffff;
+    padding: 18px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.login-input::placeholder {
+    color: #b2bcc7;
+    font-weight: 400;
+}
+
+.login-input:focus {
+    background-color: #26384b; /* Azul más claro al enfocar */
+    border: none;
+    box-shadow: 0 0 0 2px #23e5eb; /* Sombra turquesa estilo ÁGORA */
+    color: #ffffff;
+}
+
+/*
+ * 4. BOTONES (CTA)
+*/
+
+.btn-login-netflix {
+    background-color: #23e5eb;  /* Turquesa ÁGORA */
+    border: none;
+    color: #ffffff;
+    padding: 14px 0;
+    font-size: 1.15rem;
+    font-weight: 700 !important;
+    border-radius: 4px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px #19e7e838;
+}
+
+.btn-login-netflix:hover {
+    background-color: #1d222b; /* Azul oscuro corporativo */
+    color: #23e5eb;
+    box-shadow: 0 4px 18px #23e5eb55;
+}
+
+/* Botón secundario (Gris claro corporativo) */
+.btn-secondary-netflix {
+    background-color: #b2bcc7;
+    border: none;
+    color: #1d222b;
+    padding: 12px 0;
+    font-size: 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-secondary-netflix:hover {
+    background-color: #8da0ae;
+    color: #23e5eb;
+}
+
+/*
+ * 5. CHECKBOX Y ENLACES
+*/
+
+.form-check-input {
+    background-color: #232938;
+    border: 1px solid #23e5eb;
+    margin-right: 0.5rem;
+    border-radius: 2px;
+}
+
+.form-check-input:checked {
+    background-color: #23e5eb;
+    border-color: #1d222b;
+}
+
+.text-muted {
+    color: #8da0ae !important; /* Gris medio ÁGORA */
+}
+
+.small-link {
+    color: #23e5eb;
+    transition: color 0.2s;
+}
+
+.small-link:hover {
+    color: #1d222b;
+    text-decoration: underline;
+}
+
+/*
+ * 6. LOGOTIPO PERSONALIZADO ÁGORA FINANCE (inclúyelo si tienes logo textual)
+*/
+.logo-text-container {
+    text-align: center;
+    margin-bottom: 2.3rem;
+    user-select: none;
+}
+
+.logo-maintext {
+    font-size: 2.6rem;
+    letter-spacing: 0.13em;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 800;
+    color: #f5f8ff;
+    text-shadow: 0 2px 18px #ffffffb0;
+}
+
+.logo-o {
+    color: #23e5eb;
+    font-weight: 900;
+    font-size: 2.7rem;
+    text-shadow: 0 0 14px #19e7e8a8, 0 0 2px #23e5eb;
+    display: inline-block;
+    filter: drop-shadow(0 0 8px #1ee7e8cc);
+}
+
+.logo-subtext {
+    display: block;
+    margin-top: 0.22em;
+    letter-spacing: 0.34em;
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: #b2bcc7;
+    font-size: 1.25rem;
+    font-weight: 500;
+    opacity: 0.85;
+    text-shadow: 0 1px 8px #fff5;
+}

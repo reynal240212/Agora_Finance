@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}ÁGORA FINANCE - Préstamos al Instante{% endblock %}
+
+{% block content %}
+<div class="main-wrapper text-light">
+    
+    <section class="hero-section py-5" style="background: linear-gradient(135deg, var(--bg-body) 0%, #1a2333 100%); min-height: 80vh; display: flex; align-items: center;">
+        <div class="container">
+            <div class="row align-items-center gy-5">
+                <div class="col-lg-7 text-start">
+                    <span class="badge rounded-pill bg-dark border border-secondary mb-3 px-3 py-2 text-uppercase fw-bold" style="letter-spacing: 1px; color: var(--accent-color);">
+                        <i class="fas fa-bolt me-2"></i> Sin papeleo físico
+                    </span>
+                    <h1 class="display-3 fw-black mb-4" style="font-weight: 900; line-height: 1.1; color: #ffffff;">
+                        Tu préstamo <span style="color: var(--accent-color);">al instante</span> directo a tu cuenta.
+                    </h1>
+                    <p class="lead mb-5" style="color: var(--text-muted); max-width: 550px;">
+                        Olvídate de las filas. Solicita desde tu celular y recibe el dinero en minutos. Soluciones financieras diseñadas para tu ritmo de vida.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('login') }}" class="btn btn-acento btn-lg rounded-pill px-5 shadow-lg">Solicitar Ahora <i class="fas fa-arrow-right ms-2"></i></a>
+                        <a href="#pasos" class="btn btn-outline-light btn-lg rounded-pill px-4">Ver requisitos</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-lg p-4" style="border-radius: 24px; background-color: var(--bg-card); color: #ffffff;">
+                        <div class="card-body">
+                            <h3 class="text-center mb-4 fw-bold">Simula tu Crédito</h3>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0 fw-bold">¿Cuánto necesitas?</label>
+                                    <span id="montoDisplay" class="h4 mb-0 fw-black" style="color: var(--accent-color);">$500.000</span>
+                                </div>
+                                <input type="range" class="form-range" min="100000" max="5000000" step="50000" id="montoRange" value="500000">
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Frecuencia</label>
+                                    <select class="form-select bg-dark text-white border-secondary custom-select" id="frecuenciaSim">
+                                        <option value="diario">Diario</option>
+                                        <option value="semanal">Semanal</option>
+                                        <option value="quincenal">Quincenal</option>
+                                        <option value="mensual" selected>Mensual</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Plazo</label>
+                                    <select class="form-select bg-dark text-white border-secondary custom-select" id="plazoSim">
+                                        <option value="1">1 Cuota</option>
+                                        <option value="2">2 Cuotas</option>
+                                        <option value="3">3 Cuotas</option>
+                                        <option value="6">6 Cuotas</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="p-3 rounded-4 mb-4" style="background-color: var(--bg-input); border: 1px solid var(--border-color);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-light opacity-75">Cuota estimada:</span>
+                                    <span id="cuotaDisplay" class="h3 mb-0 fw-black" style="color: #ffffff;">$512.500</span>
+                                </div>
+                            </div>
+
+                            <a href="{{ url_for('login') }}" class="btn btn-acento w-100 py-3 rounded-pill fw-bold text-uppercase shadow-sm">
+                                SOLICITAR AHORA <i class="fas fa-chevron-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pasos" class="py-5" style="background-color: var(--bg-body);">
+        <div class="container text-center py-5">
+            <h2 class="display-5 fw-bold mb-5" style="color: #ffffff;">Dinero en 3 pasos</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-5 rounded-5 h-100 transition-hover" style="background-color: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="display-1 fw-black mb-3" style="opacity: 0.2; color: #ffffff;">1</div>
+                        <i class="fas fa-user-plus fa-3x mb-4" style="color: var(--accent-color);"></i>
+                        <h4 class="fw-bold text-white">Regístrate</h4>
+                        <p style="color: var(--text-muted);">Crea tu cuenta con tus datos básicos y verifica tu identidad en segundos.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-5 rounded-5 h-100 transition-hover" style="background-color: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="display-1 fw-black mb-3" style="opacity: 0.2; color: #ffffff;">2</div>
+                        <i class="fas fa-calculator fa-3x mb-4" style="color: var(--accent-color);"></i>
+                        <h4 class="fw-bold text-white">Simula</h4>
+                        <p style="color: var(--text-muted);">Elige el monto y el plazo que mejor se adapte a tu capacidad de pago.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-5 rounded-5 h-100 transition-hover" style="background-color: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="display-1 fw-black mb-3" style="opacity: 0.2; color: #ffffff;">3</div>
+                        <i class="fas fa-hand-holding-usd fa-3x mb-4" style="color: var(--accent-color);"></i>
+                        <h4 class="fw-bold text-white">Recibe</h4>
+                        <p style="color: var(--text-muted);">Una vez aprobado, el dinero se transfiere directamente a tu cuenta bancaria.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Forzamos que los textos de los selects sean visibles y no negros por defecto */
+    .custom-select {
+        color: white !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    }
+    
+    .custom-select option {
+        background-color: #1a2333;
+        color: white;
+    }
+
+    .fw-black { font-weight: 900 !important; }
+    
+    .transition-hover {
+        transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    
+    .transition-hover:hover {
+        transform: translateY(-10px);
+        border-color: var(--accent-color) !important;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: var(--accent-color);
+    }
+</style>
+
+<script>
+// El script permanece igual, solo asegúrate de que esté cargado
+document.addEventListener('DOMContentLoaded', function() {
+    const range = document.getElementById('montoRange');
+    const montoDisplay = document.getElementById('montoDisplay');
+    const frecuencia = document.getElementById('frecuenciaSim');
+    const plazo = document.getElementById('plazoSim');
+    const cuotaDisplay = document.getElementById('cuotaDisplay');
+
+    function calcularSimulacion() {
+        const monto = parseInt(range.value);
+        const numCuotas = parseInt(plazo.value);
+        const tasaMensual = 0.025; 
+
+        const totalInteres = monto * tasaMensual * numCuotas;
+        const totalPagar = monto + totalInteres;
+        const valorCuota = totalPagar / numCuotas;
+
+        montoDisplay.innerText = '$' + monto.toLocaleString('es-CO');
+        cuotaDisplay.innerText = '$' + Math.round(valorCuota).toLocaleString('es-CO');
+    }
+
+    range.addEventListener('input', calcularSimulacion);
+    frecuencia.addEventListener('change', calcularSimulacion);
+    plazo.addEventListener('change', calcularSimulacion);
+    
+    calcularSimulacion();
+});
+</script>
+{% endblock %}
