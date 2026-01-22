@@ -1,13 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify
+import os
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime, timedelta
-import os
 import requests
 from supabase import create_client, Client
 
-# --- CONFIGURACIÓN DE RUTAS DINÁMICAS ---
-# Asegura que Flask encuentre las carpetas en cualquier entorno
+# --- CONFIGURACIÓN DE RUTAS DINÁMICAS (Para Vercel) ---
 base_dir = os.path.abspath(os.path.dirname(__file__))
 template_dir = os.path.join(base_dir, 'app', 'templates')
 static_dir = os.path.join(base_dir, 'app', 'static')
@@ -16,12 +15,13 @@ app = Flask(__name__,
             template_folder=template_dir, 
             static_folder=static_dir)
 
-app.secret_key = "067861b84dfa59352ff40b9943cf048ca7a401e5a6c21348"
+app.secret_key = os.environ.get("SECRET_KEY", "067861b84dfa59352ff40b9943cf048ca7a401e5a6c21348")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 # --- CONFIGURACIÓN DE SUPABASE ---
 SUPABASE_URL = "https://clpypbkkjwaixbexdepd.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNscHlwYmtrandhaXhiZXhkZXBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNzk0MjMsImV4cCI6MjA3OTc1NTQyM30.-RgEv47KXtPqFjeL1UI5Ocmj0HOzHCGaxl3SJGF-8fE"
+# Es mejor usar os.environ para la KEY, pero mantengo la tuya para que funcione ya mismo
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNscHlwYmtrandhaXhiZXhkZXBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNzk0MjMsImV4cCI6MjA3OTc1NTQyM30.-RgEv47KXtPqFjeL1UI5Ocmj0HOzHCGaxl3SJGF-8fE")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- CONSTANTES ---
@@ -43,7 +43,7 @@ def geocode_address(address):
     except: pass
     return None
 
-# --- DECORADORES DE SEGURIDAD ---
+# --- DECORADORES ---
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -56,7 +56,6 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        # Verifica si el rol en sesión es Administrador
         if not session.get("logged_in") or session.get("rol") != "Administrador":
             flash("⛔ Acceso denegado. Se requieren permisos de administrador.", "danger")
             return redirect(url_for("index"))
@@ -71,7 +70,7 @@ def index():
 @app.route("/contacto")
 def contacto():
     return render_template("contacto.html")
-    
+
 @app.route('/sobre-nosotros')
 def sobre_nosotros():
     return render_template('sobrenosotros.html')
@@ -85,20 +84,15 @@ def login():
     if request.method == "POST":
         correo = request.form.get("correo", "").strip().lower()
         password = request.form.get("password", "").strip()
-        
         try:
             res = supabase.table("usuarios").select("*").eq("correo", correo).execute()
             usuario = res.data[0] if res.data else None
-            
-            # Nota: Usamos 'password_hash' que es el nombre estándar en DB
             if not usuario or not check_password_hash(usuario.get("password_hash", ""), password):
                 flash("Credenciales incorrectas.", "danger")
                 return render_template("login.html")
-            
             if usuario.get("estado") == "Inactivo":
                 flash("Tu cuenta se encuentra inactiva.", "danger")
                 return render_template("login.html")
-
             session.clear()
             session.permanent = True
             session["logged_in"] = True
@@ -106,19 +100,12 @@ def login():
             session["correo"] = usuario["correo"]
             session["nombre"] = usuario.get("nombre", "Usuario")
             session["rol"] = usuario.get("rol", "Cliente")
-            
             flash(f"¡Bienvenido, {session['nombre']}!", "success")
-            
-            if session["rol"] == "Administrador":
-                return redirect(url_for("administracion"))
-            elif session["rol"] == "Empleado":
-                return redirect(url_for("dashboard_empleado"))
-            else:
-                return redirect(url_for("dashboard"))
+            if session["rol"] == "Administrador": return redirect(url_for("administracion"))
+            elif session["rol"] == "Empleado": return redirect(url_for("dashboard_empleado"))
+            else: return redirect(url_for("dashboard"))
         except Exception as e:
-            flash("Error de conexión con la base de datos.", "danger")
-            print(f"Error login: {e}")
-
+            flash("Error de conexión.", "danger")
     return render_template("login.html")
 
 @app.route("/logout")
@@ -132,35 +119,26 @@ def logout():
 @login_required
 def dashboard():
     user_id = session.get("user_id")
-    
     res_u = supabase.table("usuarios").select("*").eq("id", user_id).execute()
     perfil = res_u.data[0] if res_u.data else None
-
-    # Redirigir si el perfil no está completo
     if not perfil or not perfil.get("direccion") or not perfil.get("telefono"):
         flash("Por favor completa tu perfil para continuar.", "info")
         return redirect(url_for('perfil_inicial'))
-
     res_p = supabase.table("prestamos").select("*").eq("cliente_id", user_id).execute()
     prestamos = res_p.data
     activo = next((p for p in prestamos if p.get("estado") == "Activo"), None)
-    
     datos = {
         "fecha_actual": datetime.now().strftime("%d %b, %Y"),
         "prestamo_activo": activo,
         "limite_credito": LIMITE_EMPLEADO if perfil.get("situacion_laboral") == "Si" else LIMITE_INDEPENDIENTE
     }
-    
     if activo:
         res_pagos = supabase.table("pagos").select("*").eq("prestamo_id", activo["id"]).execute()
         total_pagado = sum(float(p.get("monto", 0)) for p in res_pagos.data)
-        valor_cuota = float(activo["valor_cuota"])
-        total_deuda = activo["cantidad_cuotas"] * valor_cuota
-        
+        total_deuda = activo["cantidad_cuotas"] * float(activo["valor_cuota"])
         activo["saldo_pendiente_calc"] = total_deuda - total_pagado
-        activo["cuotas_pagadas"] = int(total_pagado // valor_cuota)
-        activo["progreso"] = round((activo["cuotas_pagadas"] / activo["cantidad_cuotas"]) * 100) if activo["cantidad_cuotas"] > 0 else 0
-        
+        activo["cuotas_pagadas"] = int(total_pagado // float(activo["valor_cuota"]))
+        activo["progreso"] = round((total_pagado / total_deuda) * 100) if total_deuda > 0 else 0
     return render_template("dashboard.html", **datos)
 
 # --- RUTAS DE EMPLEADO Y PAGOS ---
@@ -170,14 +148,10 @@ def dashboard_empleado():
     if session.get("rol") not in ["Empleado", "Administrador"]:
         flash("Acceso restringido.", "danger")
         return redirect(url_for("index"))
-
     user_id = session.get("user_id")
     query = supabase.table("usuarios").select("*").eq("rol", "Cliente")
-    
-    # Si es empleado, solo ve sus clientes. Si es Admin, ve todos.
     if session.get("rol") == "Empleado":
         query = query.eq("cobrador_asignado_id", user_id)
-    
     res = query.execute()
     return render_template("dashboard_empleado.html", clients=res.data, employee_home={"lat": 6.2442, "lon": -75.5812})
 
@@ -187,12 +161,9 @@ def registrar_pago():
     data = request.json
     cliente_id = data.get('cliente_id')
     monto = float(data.get('monto', 0))
-
     res_p = supabase.table("prestamos").select("*").eq("cliente_id", cliente_id).eq("estado", "Activo").execute()
     activo = res_p.data[0] if res_p.data else None
-    
     if not activo: return jsonify({"success": False, "message": "Sin préstamo activo"})
-
     nuevo_pago = {
         "prestamo_id": activo["id"],
         "cliente_id": cliente_id,
@@ -201,16 +172,11 @@ def registrar_pago():
         "metodo_pago": data.get('metodo', 'Efectivo'),
         "observaciones": data.get('observaciones', '')
     }
-    
     supabase.table("pagos").insert(nuevo_pago).execute()
-    
-    # Verificar si terminó de pagar
     res_all_pagos = supabase.table("pagos").select("monto").eq("prestamo_id", activo["id"]).execute()
     total_pagado = sum(float(p["monto"]) for p in res_all_pagos.data)
-    
     if total_pagado >= (float(activo["valor_cuota"]) * activo["cantidad_cuotas"]):
         supabase.table("prestamos").update({"estado": "Pagado"}).eq("id", activo["id"]).execute()
-
     return jsonify({"success": True})
 
 # --- ADMINISTRACIÓN ---
@@ -225,7 +191,6 @@ def administracion():
 @app.route("/admin/gestion-prestamos")
 @admin_required
 def gestion_prestamos():
-    # Nota: Eliminamos el 'admin.' del url_for en tu template gestion_prestamos.html línea 85
     res_p = supabase.table("prestamos").select("*, usuarios!prestamos_cliente_id_fkey(nombre, apellidos)").execute()
     res_e = supabase.table("usuarios").select("*").eq("rol", "Empleado").execute()
     return render_template("gestion_prestamos.html", prestamos=res_p.data, empleados=res_e.data)
@@ -242,7 +207,6 @@ def perfil_inicial():
 def guardar_perfil():
     user_id = session['user_id']
     form_data = request.form.to_dict()
-    
     update_data = {
         "direccion": form_data.get("direccion"),
         "telefono": form_data.get("telefono"),
@@ -251,19 +215,17 @@ def guardar_perfil():
         "empresa_nombre": form_data.get("empresa_nombre"),
         "salario": float(form_data.get("salario", 0)) if form_data.get("salario") else 0
     }
-    
     geo = geocode_address(update_data["direccion"])
-    if geo:
-        update_data["latitud"], update_data["longitud"] = geo["lat"], geo["lon"]
-
+    if geo: update_data["latitud"], update_data["longitud"] = geo["lat"], geo["lon"]
     try:
         supabase.table("usuarios").update(update_data).eq("id", user_id).execute()
         flash("Perfil actualizado correctamente.", "success")
-    except Exception as e:
+    except:
         flash("Error al actualizar perfil.", "danger")
-        print(f"Error perfil: {e}")
-        
     return redirect(url_for("dashboard"))
+
+# --- VERCEL EXPORT ---
+app = app
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
